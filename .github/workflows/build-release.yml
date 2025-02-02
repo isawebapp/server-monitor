@@ -1,0 +1,49 @@
+name: Build and Release Agent Application
+
+on:
+  push:
+    tags:
+      - 'v*'  # This triggers the workflow on new tag (release) push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner for building
+
+    strategy:
+      matrix:
+        goos: [linux]  # Target platform (linux)
+        goarch: [amd64, arm64]  # Target architectures (amd64 and arm64)
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'  # Set the Go version you want to use
+
+      - name: Cache Go modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Build the Go application
+        run: |
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o agent-${{ matrix.goos }}-${{ matrix.goarch }} ./agent/agent.go
+
+      - name: Upload agent binary to GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          files: |
+            agent-linux-amd64
+            agent-linux-arm64
+
+      - name: Upload install/uninstall scripts
+        uses: actions/upload-artifact@v2
+        with:
+          name: install-uninstall-scripts
+          path: agent/install.sh, agent/uninstall.sh
