@@ -1,28 +1,29 @@
 #!/bin/bash
 
-# Define variables
-APP_NAME="monitor-agent"
-INSTALL_DIR="/usr/local/bin"
-SERVICE_FILE="/etc/systemd/system/$APP_NAME.service"
+# Variables
+APP_NAME="server-monitor-agent"
+BIN_DIR="/usr/local/bin"
+SERVICE_DIR="/etc/systemd/system"
+SERVICE_FILE="${SERVICE_DIR}/${APP_NAME}.service"
 
-# Stop the systemd service if it's running
-echo "Stopping the service..."
-systemctl stop "$APP_NAME"
+# Step 1: Stop the service
+echo "Stopping the service"
+sudo systemctl stop $APP_NAME.service
 
-# Disable the systemd service
-echo "Disabling the service..."
-systemctl disable "$APP_NAME"
+# Step 2: Disable the service
+echo "Disabling the service"
+sudo systemctl disable $APP_NAME.service
 
-# Remove the systemd service file
-echo "Removing the systemd service file..."
-rm -f "$SERVICE_FILE"
+# Step 3: Remove the systemd service file
+echo "Removing the service file"
+sudo rm -f $SERVICE_FILE
 
-# Remove the binary from the installation directory
-echo "Removing the application binary..."
-rm -f "$INSTALL_DIR/$APP_NAME"
+# Step 4: Remove the binary
+echo "Removing the binary from $BIN_DIR"
+sudo rm -f $BIN_DIR/$APP_NAME
 
-# Reload systemd to apply changes
-echo "Reloading systemd..."
-systemctl daemon-reload
+# Step 5: Reload systemd
+echo "Reloading systemd"
+sudo systemctl daemon-reload
 
-echo "Uninstallation complete. The $APP_NAME application has been removed."
+echo "Uninstallation complete."
