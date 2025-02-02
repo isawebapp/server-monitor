@@ -23,7 +23,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.23'
+          go-version: '1.19'
 
       - name: Cache Go modules
         uses: actions/cache@v2
@@ -44,15 +44,18 @@ jobs:
           # Build the Go application
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o agent-${{ matrix.goos }}-${{ matrix.goarch }} ./agent.go
 
-      - name: Upload agent binary to GitHub release
+      - name: Create a GitHub Release and Upload Binaries
         uses: ncipollo/release-action@v1
         with:
-          files: |
+          tag: ${{ github.ref }}   # Uses the tag that triggered the workflow (e.g., v1.0.0)
+          artifacts: |
             agent-linux-amd64
             agent-linux-arm64
+          generateReleaseNotes: true
+          token: ${{ secrets.GH_TOKEN }}  # Use a PAT or default GITHUB_TOKEN with sufficient permissions
 
-      - name: Upload install/uninstall scripts
-        uses: actions/upload-artifact@v4
+      - name: Upload install/uninstall scripts as artifacts
+        uses: actions/upload-artifact@v2
         with:
           name: install-uninstall-scripts
           path: agent/install.sh, agent/uninstall.sh, agent/update.sh
