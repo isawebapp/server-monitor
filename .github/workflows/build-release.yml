@@ -64,4 +64,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: install-uninstall-scripts
-          path: agent/install.sh, agent/uninstall.sh, agent/update.sh
+          path: ./agent/install.sh, ./agent/uninstall.sh, ./agent/update.sh
