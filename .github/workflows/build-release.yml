@@ -7,6 +7,10 @@ on:
   
   workflow_dispatch:  # Allow manual triggers from the GitHub UI
 
+permissions:
+  packages: write
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -45,17 +49,16 @@ jobs:
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o agent-${{ matrix.goos }}-${{ matrix.goarch }} ./agent.go
 
       - name: Create a GitHub Release and Upload Binaries
-        uses: ncipollo/release-action@v1
+        uses: elgohr/github-release-action@v5
         with:
-          tag: ${{ github.ref }}   # Uses the tag that triggered the workflow (e.g., v1.0.0)
-          artifacts: |
+          title: MyReleaseMessage
+          tag: ${{ github.ref_name }}   # Uses the tag that triggered the workflow (e.g., v1.0.0)
+          files: |
             agent-linux-amd64
             agent-linux-arm64
-          generateReleaseNotes: true
-          token: ${{ secrets.GH_TOKEN }}  # Use a PAT or default GITHUB_TOKEN with sufficient permissions
 
       - name: Upload install/uninstall scripts as artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
           name: install-uninstall-scripts
           path: agent/install.sh, agent/uninstall.sh, agent/update.sh
