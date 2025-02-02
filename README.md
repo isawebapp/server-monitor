@@ -1,7 +1,11 @@
 ```
-bash <(wget -qO- -o- https://github.com/isawebapp/server-monitor/releases/download/v0.0.1/install.sh)
+curl -sSL https://raw.githubusercontent.com/isawebapp/server-monitor/refs/heads/main/agent/install.sh | sudo bash
 ```
 
 ```
-bash <(wget -qO- -o- https://github.com/isawebapp/server-monitor/releases/download/v0.0.1/uninstall.sh)
+curl -sSL https://raw.githubusercontent.com/isawebapp/server-monitor/refs/heads/main/agent/update.sh | sudo bash
+```
+
+```
+curl -sSL https://raw.githubusercontent.com/isawebapp/server-monitor/refs/heads/main/agent/uninstall.sh | sudo bash
 ```
