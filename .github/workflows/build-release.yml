@@ -15,19 +15,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        goos: [linux]  # Target OS
-        goarch: [amd64, arm64]  # Target architectures
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Go
+      - name: Set up Go 1.23
         uses: actions/setup-go@v2
         with:
-          go-version: '1.23'
+          go-version: '1.23'  # Set Go version to 1.23
 
       - name: Cache Go modules
         uses: actions/cache@v2
@@ -39,29 +34,34 @@ jobs:
 
       - name: Install dependencies and build the application
         run: |
-          # Navigate to the agent directory
-          cd agent
+          # Navigate to the agent directory inside the GitHub workspace
+          cd ${{ github.workspace }}/agent
           
           # Initialize Go modules if needed
           go mod tidy
           
-          # Build the Go application
+          # Build the Go application for both linux/amd64 and linux/arm64
           GOOS=linux GOARCH=amd64 go build -v -o agent-linux-amd64 ./agent.go
           GOOS=linux GOARCH=arm64 go build -v -o agent-linux-arm64 ./agent.go
+
+      - name: List build artifacts
+        run: |
+          ls -al ${{ github.workspace }}/agent  # List the contents of the agent directory to verify the files exist
 
       - name: Create a GitHub Release and Upload Binaries
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}   # Uses the tag that triggered the workflow (e.g., v1.0.0)
           files: |
-            agent-linux-amd64
-            agent-linux-arm64
+            ${{ github.workspace }}/agent/agent-linux-amd64
+            ${{ github.workspace }}/agent/agent-linux-arm64
           generate_release_notes: true   # Automatically generate release notes (optional)
+          token: ${{ secrets.GITHUB_TOKEN }}  # Authentication token
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set GH_TOKEN environment variable for authentication
 
       - name: Upload install/uninstall scripts as artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4  # Updated to v4
         with:
           name: install-uninstall-scripts
-          path: ./agent/install.sh, ./agent/uninstall.sh, ./agent/update.sh
+          path: ${{ github.workspace }}/agent/install.sh, ${{ github.workspace }}/agent/uninstall.sh, ${{ github.workspace }}/agent/update.sh
