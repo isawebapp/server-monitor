@@ -2,7 +2,10 @@ module monitor
 
 go 1.23.5
 
-require github.com/shirou/gopsutil/v4 v4.25.1
+require (
+	github.com/shirou/gopsutil/v4 v4.25.1
+	gopkg.in/yaml.v2 v2.4.0
+)
 
 require (
 	github.com/ebitengine/purego v0.8.2 // indirect
