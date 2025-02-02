@@ -1,55 +1,55 @@
 #!/bin/bash
 
-# Define variables
-APP_NAME="monitor-agent"
-APP_URL="https://raw.githubusercontent.com/isawebapp/server-monitor/refs/heads/main/agent/agent.go"  # Change this to the actual URL
-INSTALL_DIR="/usr/local/bin"
-SERVICE_FILE="/etc/systemd/system/$APP_NAME.service"
+# Variables
+APP_NAME="server-monitor-agent"
+BIN_DIR="/usr/local/bin"
+SERVICE_DIR="/etc/systemd/system"
+SERVICE_FILE="${SERVICE_DIR}/${APP_NAME}.service"
+DOWNLOAD_URL="https://github.com/isawebapp/server-monitor/releases/download/v0.0.1/agent.go"
 
-# Update and install dependencies
-echo "Updating system and installing Go..."
-apt update && apt install -y golang
+# Step 1: Install Go if not already installed (optional, for automation)
+if ! command -v go &> /dev/null
+then
+    echo "Go not found, please install Go first."
+    exit 1
+fi
 
-# Create a temporary working directory
-TMP_DIR=$(mktemp -d)
-cd "$TMP_DIR" || exit 1
+# Step 2: Download the Go file
+echo "Downloading Go application from $DOWNLOAD_URL"
+curl -L $DOWNLOAD_URL -o /tmp/agent.go
 
-# Download the Go application
-echo "Downloading the application..."
-curl -o "$APP_NAME.go" -L "$APP_URL"
+# Step 3: Build the Go binary
+echo "Building the Go application"
+go run /tmp/agent.go -o /tmp/$APP_NAME
 
-# Build the Go application
-echo "Building the application..."
-go build -o "$APP_NAME" "$APP_NAME.go"
+# Step 4: Move binary to /usr/local/bin
+echo "Moving the binary to $BIN_DIR"
+sudo mv /tmp/$APP_NAME $BIN_DIR/
 
-# Move the binary to the installation directory
-echo "Installing the application..."
-mv "$APP_NAME" "$INSTALL_DIR/"
-
-# Create systemd service file
-echo "Creating systemd service..."
-cat <<EOF | tee "$SERVICE_FILE"
+# Step 5: Create a systemd service file
+echo "Creating systemd service file at $SERVICE_FILE"
+sudo bash -c "cat > $SERVICE_FILE" << EOF
 [Unit]
-Description=Agent Service
+Description=Server Monitor Agent
 After=network.target
 
 [Service]
-ExecStart=$INSTALL_DIR/$APP_NAME
+ExecStart=$BIN_DIR/$APP_NAME
 Restart=always
-User=root
-WorkingDirectory=$INSTALL_DIR
+User=nobody
+Group=nogroup
+WorkingDirectory=/tmp
+Environment=PATH=/usr/bin:/usr/local/bin
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-# Reload systemd, enable, and start the service
-echo "Enabling and starting the service..."
-systemctl daemon-reload
-systemctl enable "$APP_NAME"
-systemctl start "$APP_NAME"
+# Step 6: Reload systemd, enable and start the service
+echo "Reloading systemd, enabling and starting the service"
+sudo systemctl daemon-reload
+sudo systemctl enable $APP_NAME.service
+sudo systemctl start $APP_NAME.service
 
-# Clean up
-rm -rf "$TMP_DIR"
-
-echo "Installation complete. Service is running."
+echo "Installation complete. The server monitor agent is running."
