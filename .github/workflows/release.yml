@@ -32,13 +32,22 @@ jobs:
       run: |
         echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-    # Step 5: Create a new GitHub release
+    # Step 5: Create Git tag from the version
+    - name: Create Git Tag
+      run: |
+        VERSION=${{ steps.read_version.outputs.version }}
+        git tag -a $VERSION -m "Release $VERSION"
+        git push origin $VERSION
+
+    # Step 6: Create a new GitHub release
     - name: Create GitHub Release
       run: |
-        gh release create ${{ steps.read_version.outputs.version }} agent/* --title "Release ${{ steps.read_version.outputs.version }}" --notes "Automated release for ${{ steps.read_version.outputs.version }}"
+        VERSION=${{ steps.read_version.outputs.version }}
+        gh release create $VERSION agent/* --title "Release $VERSION" --notes "Automated release for $VERSION"
 
-    # Step 6: Upload files to the release (excluding VERSION.txt)
+    # Step 7: Upload files to the release (excluding VERSION.txt)
     - name: Upload files to release (excluding VERSION.txt)
       run: |
+        VERSION=${{ steps.read_version.outputs.version }}
         # Exclude VERSION.txt and upload other files
-        find agent/ -type f ! -name 'VERSION.txt' -exec gh release upload ${{ steps.read_version.outputs.version }} {} --clobber \;
+        find agent/ -type f ! -name 'VERSION.txt' -exec gh release upload $VERSION {} --clobber \;
