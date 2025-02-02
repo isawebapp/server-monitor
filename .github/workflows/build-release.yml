@@ -52,7 +52,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}   # Uses the tag that triggered the workflow (e.g., v1.0.0)
-          assets: |
+          files: |
             agent-linux-amd64
             agent-linux-arm64
           generate_release_notes: true   # Automatically generate release notes (optional)
