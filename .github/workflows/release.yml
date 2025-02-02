@@ -19,11 +19,11 @@ jobs:
         sudo apt update
         sudo apt install gh
 
-    # Step 3: Read version from VERSION.txt
-    - name: Read version from VERSION.txt
+    # Step 3: Read version from agent/VERSION.txt
+    - name: Read version from agent/VERSION.txt
       id: read_version
       run: |
-        VERSION=$(cat VERSION.txt)
+        VERSION=$(cat agent/VERSION.txt)
         echo "Release version is: $VERSION"
         echo "::set-output name=version::$VERSION"
 
@@ -33,7 +33,8 @@ jobs:
         gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
         gh release create ${{ steps.read_version.outputs.version }} agent/* --title "Release ${{ steps.read_version.outputs.version }}" --notes "Automated release for ${{ steps.read_version.outputs.version }}"
 
-    # Step 5: Upload files to the release (if additional files need to be attached)
-    - name: Upload files to release
+    # Step 5: Upload files to the release (excluding VERSION.txt)
+    - name: Upload files to release (excluding VERSION.txt)
       run: |
-        gh release upload ${{ steps.read_version.outputs.version }} agent/* --clobber
+        # Exclude VERSION.txt and upload other files
+        find agent/ -type f ! -name 'VERSION.txt' -exec gh release upload ${{ steps.read_version.outputs.version }} {} --clobber \;
