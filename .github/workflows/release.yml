@@ -19,11 +19,11 @@ jobs:
         sudo apt update
         sudo apt install gh
 
-    # Step 3: Get version from Git tag or use a custom version (you can modify this part)
-    - name: Get release version
-      id: get_version
+    # Step 3: Read version from VERSION.txt
+    - name: Read version from VERSION.txt
+      id: read_version
       run: |
-        VERSION=$(git describe --tags --abbrev=0)
+        VERSION=$(cat VERSION.txt)
         echo "Release version is: $VERSION"
         echo "::set-output name=version::$VERSION"
 
@@ -31,9 +31,9 @@ jobs:
     - name: Create GitHub Release
       run: |
         gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
-        gh release create ${{ steps.get_version.outputs.version }} agent/* --title "Release ${{ steps.get_version.outputs.version }}" --notes "Automated release for ${{ steps.get_version.outputs.version }}"
+        gh release create ${{ steps.read_version.outputs.version }} agent/* --title "Release ${{ steps.read_version.outputs.version }}" --notes "Automated release for ${{ steps.read_version.outputs.version }}"
 
     # Step 5: Upload files to the release (if additional files need to be attached)
     - name: Upload files to release
       run: |
-        gh release upload ${{ steps.get_version.outputs.version }} agent/* --clobber
+        gh release upload ${{ steps.read_version.outputs.version }} agent/* --clobber
