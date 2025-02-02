@@ -49,13 +49,15 @@ jobs:
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o agent-${{ matrix.goos }}-${{ matrix.goarch }} ./agent.go
 
       - name: Create a GitHub Release and Upload Binaries
-        uses: elgohr/github-release-action@v5
+        uses: softprops/action-gh-release@v2
         with:
-          title: MyReleaseMessage
-          tag: ${{ github.ref_name }}   # Uses the tag that triggered the workflow (e.g., v1.0.0)
-          files: |
+          tag_name: ${{ github.ref_name }}   # Uses the tag that triggered the workflow (e.g., v1.0.0)
+          assets: |
             agent-linux-amd64
             agent-linux-arm64
+          generate_release_notes: true   # Automatically generate release notes (optional)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set GH_TOKEN environment variable for authentication
 
       - name: Upload install/uninstall scripts as artifacts
         uses: actions/upload-artifact@v4
