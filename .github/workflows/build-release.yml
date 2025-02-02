@@ -55,7 +55,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}  # Use a PAT or default GITHUB_TOKEN with sufficient permissions
 
       - name: Upload install/uninstall scripts as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: install-uninstall-scripts
           path: agent/install.sh, agent/uninstall.sh, agent/update.sh
