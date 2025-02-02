@@ -7,7 +7,7 @@ if [ "$(id -u)" -ne "0" ]; then
 fi
 
 # Define the GitHub release URL (replace with your actual URL)
-RELEASE_URL="https://github.com/username/repository/releases/download/v1.0.0"
+RELEASE_URL="https://github.com/isawebapp/server-monitor/releases/latest/download/"
 
 # Detect the architecture
 ARCH=$(uname -m)
