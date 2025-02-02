@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/shirou/gopsutil/v4/mem"
 	"github.com/shirou/gopsutil/v4/net"
 	"github.com/shirou/gopsutil/v4/process"
+	"gopkg.in/yaml.v2"
 )
 
 // NetworkSummary struct to store summarized network statistics
@@ -39,6 +41,25 @@ type SystemInfo struct {
 	HostInfo      *host.InfoStat         `json:"host_info"`
 	LoadAverage   *load.AvgStat          `json:"load_average"`
 	ProcessCount  int                    `json:"process_count"`
+}
+
+// Config struct to read the config file
+type Config struct {
+	WebhookURL string `yaml:"webhook_url"`
+}
+
+// ReadConfig reads the configuration from a YAML file
+func ReadConfig(configFile string) (Config, error) {
+	var config Config
+	data, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		return config, err
+	}
+	err = yaml.Unmarshal(data, &config)
+	if err != nil {
+		return config, err
+	}
+	return config, nil
 }
 
 func gatherSystemInfo() SystemInfo {
@@ -131,8 +152,15 @@ func sendToWebhook(url string, data interface{}) {
 }
 
 func main() {
-	// Webhook URL
-	webhookURL := "http://localhost:5000/api/server_data"
+	// Read configuration file
+	configFile := "./config.yml" // Assuming config is in the same directory
+	config, err := ReadConfig(configFile)
+	if err != nil {
+		log.Fatalf("Error reading config file: %v", err)
+	}
+
+	// Webhook URL from config
+	webhookURL := config.WebhookURL
 
 	// Create a ticker that ticks every 3 seconds
 	ticker := time.NewTicker(3 * time.Second)
