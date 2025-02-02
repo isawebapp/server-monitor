@@ -46,7 +46,8 @@ jobs:
           go mod tidy
           
           # Build the Go application
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o agent-${{ matrix.goos }}-${{ matrix.goarch }} ./agent.go
+          GOOS=linux GOARCH=amd64 go build -v -o agent-linux-amd64 ./agent.go
+          GOOS=linux GOARCH=arm64 go build -v -o agent-linux-arm64 ./agent.go
 
       - name: Create a GitHub Release and Upload Binaries
         uses: softprops/action-gh-release@v2
