@@ -3,16 +3,18 @@ name: Build and Release Agent Application
 on:
   push:
     tags:
-      - 'v*'  # This triggers the workflow on new tag (release) push
+      - 'v*'  # Trigger when a new tag is pushed (for release)
+
+  workflow_dispatch:  # Allow manual triggers from the GitHub UI
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner for building
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        goos: [linux]  # Target platform (linux)
-        goarch: [amd64, arm64]  # Target architectures (amd64 and arm64)
+        goos: [linux]  # Target OS
+        goarch: [amd64, arm64]  # Target architectures
 
     steps:
       - name: Checkout repository
@@ -21,7 +23,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.19'  # Set the Go version you want to use
+          go-version: '1.19'
 
       - name: Cache Go modules
         uses: actions/cache@v2
@@ -46,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: install-uninstall-scripts
-          path: agent/install.sh, agent/uninstall.sh
+          path: agent/install.sh, agent/uninstall.sh, agent/update.sh

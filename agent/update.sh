@@ -24,25 +24,7 @@ fi
 
 chmod +x /usr/local/bin/agent
 
-# Create a systemd service file
-cat <<EOF > /etc/systemd/system/agent.service
-[Unit]
-Description=Agent Application
-After=network.target
+# Restart the systemd service
+systemctl restart agent.service
 
-[Service]
-ExecStart=/usr/local/bin/agent
-Restart=always
-User=nobody
-Group=nogroup
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Reload systemd, enable, and start the service
-systemctl daemon-reload
-systemctl enable agent.service
-systemctl start agent.service
-
-echo "Installation complete! The agent service is now running."
+echo "Update complete! The agent service has been restarted."
