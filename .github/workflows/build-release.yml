@@ -55,13 +55,10 @@ jobs:
           files: |
             ${{ github.workspace }}/agent/agent-linux-amd64
             ${{ github.workspace }}/agent/agent-linux-arm64
+            ${{ github.workspace }}/agent/install.sh
+            ${{ github.workspace }}/agent/uninstall.sh
+            ${{ github.workspace }}/agent/update.sh
           generate_release_notes: true   # Automatically generate release notes (optional)
           token: ${{ secrets.GITHUB_TOKEN }}  # Authentication token
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set GH_TOKEN environment variable for authentication
-
-      - name: Upload install/uninstall scripts as artifacts
-        uses: actions/upload-artifact@v4  # Updated to v4
-        with:
-          name: install-uninstall-scripts
-          path: ${{ github.workspace }}/agent/install.sh, ${{ github.workspace }}/agent/uninstall.sh, ${{ github.workspace }}/agent/update.sh
