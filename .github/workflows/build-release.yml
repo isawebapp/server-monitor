@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - 'v*'  # Trigger when a new tag is pushed (for release)
-
+  
   workflow_dispatch:  # Allow manual triggers from the GitHub UI
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.23.5'
+          go-version: '1.19'
 
       - name: Cache Go modules
         uses: actions/cache@v2
@@ -33,9 +33,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Build the Go application
+      - name: Install dependencies and build the application
         run: |
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o agent-${{ matrix.goos }}-${{ matrix.goarch }} ./agent/agent.go
+          # Navigate to the agent directory
+          cd agent
+          
+          # Initialize Go modules if needed
+          go mod tidy
+          
+          # Build the Go application
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o agent-${{ matrix.goos }}-${{ matrix.goarch }} ./agent.go
 
       - name: Upload agent binary to GitHub release
         uses: ncipollo/release-action@v1
@@ -45,7 +52,7 @@ jobs:
             agent-linux-arm64
 
       - name: Upload install/uninstall scripts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
           name: install-uninstall-scripts
           path: agent/install.sh, agent/uninstall.sh, agent/update.sh
