@@ -2,15 +2,15 @@
 
 ## Install
 ```
-curl -sSL https://raw.githubusercontent.com/isawebapp/server-monitor/refs/heads/main/agent/install.sh | sudo bash
+curl -sSL https://github.com/isawebapp/server-monitor/releases/latest/download/install.sh | sudo bash
 ```
 
 ## Update
 ```
-curl -sSL https://raw.githubusercontent.com/isawebapp/server-monitor/refs/heads/main/agent/update.sh | sudo bash
+curl -sSL https://github.com/isawebapp/server-monitor/releases/latest/download/update.sh | sudo bash
 ```
 
 ## Uninstall
 ```
-curl -sSL https://raw.githubusercontent.com/isawebapp/server-monitor/refs/heads/main/agent/uninstall.sh | sudo bash
+curl -sSL https://github.com/isawebapp/server-monitor/releases/latest/download/uninstall.sh | sudo bash
 ```
