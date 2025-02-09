@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -51,7 +51,7 @@ type Config struct {
 // ReadConfig reads the configuration from a YAML file
 func ReadConfig(configFile string) (Config, error) {
 	var config Config
-	data, err := ioutil.ReadFile(configFile)
+	data, err := os.ReadFile(configFile)
 	if err != nil {
 		return config, err
 	}
